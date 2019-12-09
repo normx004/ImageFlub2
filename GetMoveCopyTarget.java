@@ -36,11 +36,11 @@ public class GetMoveCopyTarget {
     }
     
     static public JList getListFromProps(String fileList, String delim) {
-    	System.out.println("list of move-to directories is "+fileList);
-	    	String[] targets = fileList.split(delim,0);
-	    	System.out.println("list contains "+targets.length+" strings");
-	    	JList<String> list = new JList<String>(targets);
-	    	return list;
+    	System.out.println("list of move/copy-to directories is "+fileList);
+	    String[] targets = fileList.split(delim,0);
+	    System.out.println("list contains "+targets.length+" strings");
+	    JList<String> list = new JList<String>(targets);
+	    return list;
     }
 	
 	

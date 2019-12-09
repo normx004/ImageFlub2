@@ -19,12 +19,12 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 		private Writer                          getWriter(){return wrt;}
 	    public int keepidx = 1;
 	    public int discardidx = 2;
-	    public int moveidx = 3;
-	    public int moveListidx = 0;
-	    public int copyListidx = 0;
-	    public int copyFileidx = 0;
-	    public int setMoveDiridx = 0;
-	    public int setCopyDiridx = 0;
+	    public int moveFileIdx = 3;
+	    public int moveListIdx = 0;
+	    public int copyListIdx = 0;
+	    public int copyFileIdx = 0;
+	    public int setMoveDirIdx = 0;
+	    public int setCopyDirIdx = 0;
 	    
 	    		
 		
@@ -47,34 +47,35 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 				out("adding altMove button at "+kx);
 				buttLabels.add( new String("altMove"));
 				k += 1;
-				moveListidx = k;
+				moveListIdx = k;
 			}
 			
 			buttLabels.add(new String("copyFile"));
 			k += 1;			
-			copyFileidx = k;
-			out("coyp file idx is "+copyFileidx);
+			copyFileIdx = k;
+			out("coyp file idx is "+copyFileIdx);
 			
 			if (fm.getCopyList() != null) {
-				out("adding altCopy button");
+				int kx = k + 1;
+				out("adding altCopy button at "+kx);
 				buttLabels.add( new String("altCopy"));
 				k += 1;				
-				copyListidx = k;
-				out ("alt copy idx is "+copyListidx);
+				copyListIdx = k;
+				out ("alt copy idx is "+copyListIdx);
 			}
 			buttLabels.add(new String("setMoveDir"));
 			k += 1;
-			setMoveDiridx = k;
+			setMoveDirIdx = k;
 			buttLabels.add(new String("setCopyDir"));
 			k += 1;			
-			setCopyDiridx = k;
+			setCopyDirIdx = k;
 			
 			out(" indexs for keepidx, discardidx, moveidx, moveListidx, copyListidx, copyFileidx,setMoveDiridx, setCopyDiridx are "+ 
-			keepidx + " " +  discardidx + " " + moveidx + " " + moveListidx + " " +
-	        " " + copyListidx + 
-	        " " + copyFileidx +
-	        " " + setMoveDiridx +
-	        " " + setCopyDiridx);
+			keepidx + " " +  discardidx + " " + moveFileIdx + " " + moveListIdx + " " +
+	        " " + copyListIdx + 
+	        " " + copyFileIdx +
+	        " " + setMoveDirIdx +
+	        " " + setCopyDirIdx);
 			
 			wrt = new Writer();
 		}
@@ -166,11 +167,11 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 	        	//s="keep";	    
 	        	out ("-----Keeping the file");
 	        	saveLastKeptFile(fm.getIma().getTheFile());
-	        } else if (qval == moveidx) {   //  MOVE FILE
+	        } else if (qval == moveFileIdx) {   //  MOVE FILE
 	            s = "move";
 	           	out("----------setMoveFile");
 	           	saveMoveLine(fm.getMoveToPath(), fm.getIma().getTheFile());
-	        } else  if (qval == setMoveDiridx) {  // set MOVE targe
+	        } else  if (qval == setMoveDirIdx) {  // set MOVE targe
 	    	    s = "setMoveDir";
 	    	    out("----------setMoveFile Directory");
 	    	    String mvDir = fm.getMoveToPath();
@@ -182,11 +183,11 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 	    	    this.setMoveDir(mvDir);
 	    	    b.setToolTipText(fm.getMoveToPath());
 	    	    return;
-	      	}  else if (qval == copyFileidx) {  // COPY FILE
+	      	}  else if (qval == copyFileIdx) {  // COPY FILE
 	            s = "copy";
 	           	out("----------setCopyFile");
 	           	saveCopyLine(fm.getCopyToPath(), fm.getIma().getTheFile());
-	        } else   if (qval == setCopyDiridx) {  // set COPY target
+	        } else   if (qval == setCopyDirIdx) {  // set COPY target
 	    	    s = "setCopyDir";
 	    	    out("----------setCopyFile Directory");
 	    	    String cpDir = fm.getCopyToPath();  // just does a file chooser, shold work as is
@@ -199,7 +200,7 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 	    	    this.setCopyDir(cpDir);
 	    	    b.setToolTipText(fm.getCopyToPath());
 	    	    return;
-	        } else   if (qval == moveListidx) {  // it was the altMove button - select move target from list
+	        } else   if (qval == moveListIdx) {  // it was the altMove button - select move target from list
 	    	    s = "altMove";
 	    	    out("----------move to directory from alt list");
 	    	    
@@ -214,6 +215,24 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 	    	    	// treat it as a 'keep'
 	    	    }
 	    	    saveAltMoveLine(mvDir, fm.getIma().getTheFile());
+	    	    
+	    	    //return;
+	    	    
+	        } else   if (qval == copyListIdx) {  // it was the altMove button - select move target from list
+	    	    s = "altCopy";
+	    	    out("----------copy to directory from alt list");
+	    	    
+	    	    ListDial ld = new ListDial ("choose from these dirs", fm.getCopyList());
+	    	    ld.setOnOk(e -> System.out.println("Chosen item: " + ld.getSelectedItem()));
+	            ld.show();
+	    	    //String cpDir = fm.getCopyToPath();  // just does a file chooser, shold work as is
+	    	    String cpDir = (String)ld.getSelectedItem();
+	    	    out("WOW it worked, maybe, selected item was "+cpDir);
+	    	    if (cpDir == null ) {
+	    	    	out("MakeFileYorNPanel: uh oh...get the 'copy to path' from the popup but it was null");
+	    	    	// treat it as a 'keep'
+	    	    }
+	    	    saveAltCopyLine(cpDir, fm.getIma().getTheFile());
 	    	    
 	    	    //return;
 	    	    
@@ -466,10 +485,12 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 					System.err.println("Uh Oh, failed to write to "+path);	
 				}
 				
-			}public void saveAltMoveLine(String mdir, File f) {
+			}
+			
+			public void saveAltMoveLine(String mdir, File f) {
 				out("SAVE move cmd of item  TO BAT FILE");
 				if (mdir == null) {
-					JOptionPane.showMessageDialog(fm.getFrayme(), "no 'move to' directory set. cannot move file.");
+					JOptionPane.showMessageDialog(fm.getFrayme(), "no 'move to' directory set from list. cannot move file.");
 					return;
 				}
 				String path = new String("\\temp\\delum.bat");
@@ -507,6 +528,25 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 				}
 				
 			}
+			
+			public void saveAltCopyLine(String cpdir, File f) {
+				out("SAVE copy cmd of item  TO BAT FILE");
+				if (cpdir == null) {
+					JOptionPane.showMessageDialog(fm.getFrayme(), "no 'copy to' directory set from list. cannot move file.");
+					return;
+				}
+				String path = new String("\\temp\\delum.bat");
+				String cmd = new String ("copy \"" + f.getPath() + "\" \"" + cpdir + "\"\n");
+				int num = fm.getIma().getFilesCopyed();
+				fm.getIma().setFilesCopyed(num+1);
+				boolean append = true;
+				Writer w = getWriter();
+				boolean okwrite = w.tryWrite(path, "q:", "c:", cmd, append);
+				if (!okwrite) {
+					System.err.println("Uh Oh, failed to write to "+path);	
+				}
+			}
+				
 			GetMoveCopyTarget gmctMove = null;
 			GetMoveCopyTarget gmctCopy = null;
 			
