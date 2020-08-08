@@ -13,7 +13,7 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 		private Vector<String>    buttLabels = new Vector<String>();
 		private String            borderTitle = new String("Keep or Move or Delete File?");
 		private MainFlub                   fm = null;
-		private GenericButtonPanelFactory grp = null;
+		private GenericButtonPanelFactory gbpfct = null;
 		private JPanel                      p = null;
 		private Writer                    wrt = null;
 		private Writer                          getWriter(){return wrt;}
@@ -33,8 +33,8 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 			out("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
 			out("Constructing make file yorn panel");
 			out("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
-			grp = new GenericButtonPanelFactory(this, fm);
-	
+			gbpfct = new GenericButtonPanelFactory(this, fm);
+
 			int k = 0;
 			buttLabels.add(new String("keep"));
 			k += 1;
@@ -45,7 +45,7 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 			if (fm.getMoveList() != null) {
 				int kx = k+1;
 				out("adding altMove button at "+kx);
-				buttLabels.add( new String("altMove"));
+				buttLabels.add( new String(MainFlub.AltMove));
 				k += 1;
 				moveListIdx = k;
 			}
@@ -58,7 +58,7 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 			if (fm.getCopyList() != null) {
 				int kx = k + 1;
 				out("adding altCopy button at "+kx);
-				buttLabels.add( new String("altCopy"));
+				buttLabels.add( new String(MainFlub.AltCopy));
 				k += 1;				
 				copyListIdx = k;
 				out ("alt copy idx is "+copyListIdx);
@@ -88,19 +88,20 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 			String[] blab = new String[buttLabels.size()];
 			for (int idx = 0; idx < buttLabels.size(); idx++) {
 				blab[idx] = buttLabels.elementAt(idx);
+				out("button["+idx+"] = "+blab[idx]);
 			}
-			p = grp.getButtons(bTitle, blab) ;
+			p = gbpfct.getButtons(bTitle, blab) ;
 			out("adding action");
-			grp.addAction(p);
+			gbpfct.addAction(p);
 			out("^^^^^^^^leaving MakeFileYorNPAnel:getButtons(): returning button panel  with title "+bTitle);
 			return p;
 			
 		}
 		
 		 public void out(String s) { 
-			if (fm.isDebug()) {
+			//if (fm.isDebug()) {
 				 System.out.println("MakeFileYorNPanel:" + s);
-		 	}
+		 	//}
 		 }
 		 public void uncout(String s) {
 			 System.out.println("MakeFileYornPanel:"+s);
@@ -110,14 +111,29 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 		 public void ackshun(java.awt.event.ActionEvent vent) {
 			
 		 if (fm.isDebug()) {
-		     out("MakeFileYorNPanel:ackshun(event)-------------------------decisionButtonpress-------------------------------------");
+		     out("ackshun(event)-------------------------decisionButtonpress-------------------------------------");
 		     //out("MakeFileYorNPanel:ackshun(event)--------------------------------------------------------------");
 		     //out("MakeFileYorNPanel:ackshun(event)decision Button: " + vent.toString());
-		     out("MakeFileYorNPanel:ackshun(event)Event value :    " + vent.getActionCommand());
+		     out("ackshun(event)Event value :    " + vent.getActionCommand());
   		     //out("MakeFileYorNPanel:ackshun(event)--------------------------------------------------------------");
 		     //out("MakeFileYorNPanel:ackshun(event)--------------------------------------------------------------");
-		  }
-		 
+		  	}
+		    // first lets find out where the panel is
+		    Rectangle rec = p.getVisibleRect();
+		    Point panelP = rec.getLocation();
+		    //String nes = new String("ok, button panel is at point "+ panelP.x + "," + panelP.y);
+		    //out (nes);
+		    
+		 	int panelX = p.getX();
+		 	int panelY = p.getY();
+		 	
+		 	//ok, just hard code it for now
+		 	panelX = 600;
+		 	panelY = 1000;
+		 	
+		 	String msg = new String("ackshun: panel x, y is " + panelX + " " + panelY);
+		 	out(msg);
+		 	// now figure out which button was pushed
 		    int qval = -1;
 		    Object[] jbut = p.getComponents();
 		    int i = 0;
@@ -133,7 +149,7 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 		    int j = i+1;
 		    qval = j;
 		    out("done with 'check which button loop', i is " + i + " which means it was button " +j);
-		    
+		    // OK, now we know which button it was...do something about it!
 		    String s = new String("keep");
 		    if (qval == discardidx) {
 	           s = "discard";
@@ -176,14 +192,14 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 	    	    out("----------setMoveFile Directory");
 	    	    String mvDir = fm.getMoveToPath();
 	    	    if (mvDir == null ) {
-	    	    	out("MakeFileYorNPanel: uh oh...get the 'move to path' from MainFlub but was null!!!");
+	    	    	out("uh oh...get the 'move to path' from MainFlub but was null!!!");
 	    	    	mvDir = new String("c:\\temp\\dummyTargetDir");
 	    	    }
-	    	    // now call the routine that pops a file chooser
+	    	    // new move-to target
 	    	    this.setMoveDir(mvDir);
 	    	    b.setToolTipText(fm.getMoveToPath());
 	    	    return;
-	      	}  else if (qval == copyFileIdx) {  // COPY FILE
+	      	}  else if (qval == copyFileIdx) {  // COPY FILE target
 	            s = "copy";
 	           	out("----------setCopyFile");
 	           	saveCopyLine(fm.getCopyToPath(), fm.getIma().getTheFile());
@@ -192,7 +208,7 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 	    	    out("----------setCopyFile Directory");
 	    	    String cpDir = fm.getCopyToPath();  // just does a file chooser, shold work as is
 	    	    if (cpDir == null ) {
-	    	    	out("MakeFileYorNPanel: uh oh...get the 'copy to path' from MainFlub but was null!!!");
+	    	    	out("uh oh...get the 'copy to path' from MainFlub but was null!!!");
 	    	    	cpDir = new String("c:\\temp");
 	    	    	fm.setCopyToPath(cpDir);
 	    	    }
@@ -201,37 +217,58 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 	    	    b.setToolTipText(fm.getCopyToPath());
 	    	    return;
 	        } else   if (qval == moveListIdx) {  // it was the altMove button - select move target from list
-	    	    s = "altMove";
+	    	    s = MainFlub.AltMove;
 	    	    out("----------move to directory from alt list");
-	    	    
+	    	    /*
 	    	    ListDial ld = new ListDial ("choose from these dirs", fm.getMoveList());
+	    	    int listDialHeight = ld.getHeight();
+	    	    String st = new String("ackshun: listDial height is "+listDialHeight);
+	    	    out(st);
 	    	    ld.setOnOk(e -> System.out.println("Chosen item: " + ld.getSelectedItem()));
-	            ld.show();
+	    	    int putMe = panelY - listDialHeight - 10;
+	    	    String nst = new String("ackshun: new Y value for dialog is "+putMe);
+	    	    out(nst);	 
+	    	    
+	            //ld.show();
+	            ld.show(900, putMe);
 	    	    //String cpDir = fm.getCopyToPath();  // just does a file chooser, shold work as is
 	    	    String mvDir = (String)ld.getSelectedItem();
 	    	    out("WOW it worked, maybe, selected item was "+mvDir);
 	    	    if (mvDir == null ) {
-	    	    	out("MakeFileYorNPanel: uh oh...get the 'move to path' from the popup but it was null");
+	    	    	out("uh oh...get the 'move to path' from the popup but it was null");
 	    	    	// treat it as a 'keep'
 	    	    }
+	    	    */
+	    	    String mvDir = fm.getAltMoveToPath();
 	    	    saveAltMoveLine(mvDir, fm.getIma().getTheFile());
 	    	    
 	    	    //return;
 	    	    
-	        } else   if (qval == copyListIdx) {  // it was the altMove button - select move target from list
-	    	    s = "altCopy";
+	        } else   if (qval == copyListIdx) {  // it was the altCopy button - select move target from list
+	    	    s = MainFlub.AltCopy;
 	    	    out("----------copy to directory from alt list");
-	    	    
+	    	    /*
 	    	    ListDial ld = new ListDial ("choose from these dirs", fm.getCopyList());
-	    	    ld.setOnOk(e -> System.out.println("Chosen item: " + ld.getSelectedItem()));
-	            ld.show();
+	    	    int listDialHeight = ld.getHeight();
+	    	    String st = new String("ackshun: listDial height is "+listDialHeight);
+	    	    out(st);
+	    	    ld.setOnOk(e -> System.out.println("ackshun: Chosen item: " + ld.getSelectedItem()));
+	    	    // now want to find location of the selection buttons so can pop the dialog just above it
+	    	    // instead of just centering it which is what the code currently does.
+	    	    int putMe = panelY - listDialHeight - 10;
+	    	    String nst = new String("ackshun: new Y value for dialog is "+putMe);
+	    	    out(nst);	    	    
+	            //ld.show(panelX+50, putMe);
+	    	    ld.show(900, putMe);
 	    	    //String cpDir = fm.getCopyToPath();  // just does a file chooser, shold work as is
 	    	    String cpDir = (String)ld.getSelectedItem();
 	    	    out("WOW it worked, maybe, selected item was "+cpDir);
 	    	    if (cpDir == null ) {
-	    	    	out("MakeFileYorNPanel: uh oh...get the 'copy to path' from the popup but it was null");
+	    	    	out("uh oh...get the 'copy to path' from the popup but it was null");
 	    	    	// treat it as a 'keep'
 	    	    }
+	    	    */
+	    	    String cpDir = fm.getAltCopyToPath();
 	    	    saveAltCopyLine(cpDir, fm.getIma().getTheFile());
 	    	    
 	    	    //return;
@@ -253,19 +290,13 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 	        if ( fm.getIma() != null ) { 
 	        	out("just displayed file "+ fm.getIma().getTheFile().getParent() + "/" + fm.getIma().getTheFile().getName());
 	        	LoadImageApp lia = fm.getIma();
-	        	/*
-				String bTitle = new String(borderTitle + "  " + fm.getIma().getTheFile().getName()
-				+ "   (w:" + lia.getOriginalW() + "  h:" + lia.getOriginalH()
-				+ ")   bytes: " + lia.getOriginalSize() 
-				+ "  (" + lia.getThisFileNumberInList() 
-				+ " of " 
-				+ lia.getFilesInDirCount()
-				);
-			 */
+	        	
 	        	String bTitle = makeBorderTitle(lia);
 				TitledBorder tb = (TitledBorder ) p.getBorder();
-				tb.setTitle(bTitle);
 				JFrame f = fm.getYornFrame();
+				tb.setTitle(bTitle);
+				String fTitle = new String( "Keep, Discard or Move File Controls from " + fm.getDir().getPath());
+				f.setTitle(fTitle);
 				out("..........calling f.repaint()..............");
 				f.repaint();
 				out("..........calling fm.doit()................");
@@ -280,8 +311,8 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 	        	out("end of files in directory");
 	        	// Modal dialog with yes/no button
 	        	JFrame fra = new JFrame();
-	        	String msg = new String("No More Files in Directory; save list?");
-	        	int answer = JOptionPane.showConfirmDialog(fra, msg);
+	        	String msga = new String("No More Files in Directory; save list?");
+	        	int answer = JOptionPane.showConfirmDialog(fra, msga);
 	        	if (answer == JOptionPane.YES_OPTION) {
 	        	    out("YES!!!");
 	        	} else if (answer == JOptionPane.NO_OPTION) {
@@ -566,167 +597,7 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 				//String dir = fm.getMoveToPath();
 				gmctCopy.setDir(mpath);
 			}
-			 //------------------------SAVEmoveLine - that is, save the move command--------------------
-/*
-			public void setMoveDir(String mpath) {
-				out("set target directory for 'move' cmd, dir WAS '"+mpath+"'");
-	
-				
-				
-				 JFileChooser fc = new JFileChooser()
-				 {
-					 protected JDialog createDialog(Component parent) throws HeadlessException {
-					    JDialog dialog = super.createDialog(parent);
-					    // …
-					    //Point p = calculateCenter(dialog);
-					    dialog.setLocation(10,20);
-					    return dialog;
-					 }
-				  };
-				 out("MakeFileOrNPanel: remote object about to create a new blank file chooser, but did we leave off somewhere?");
-				 String lyne = mpath;
-				
-				 String oldPath = fm.getMoveToPath();
-				 if (oldPath == null) {
-					 oldPath = "c:\\temp";
-					 fm.setMoveToPath(oldPath);
-				 }
-				lyne = new String(fm.getMoveToPath());
-				out("setting chooser path to " + lyne);
-				
-				
-				File parn = new File(lyne);
-				//out("parent of old path read in from file is "+parn.getParent());
-				//File parnparn = new File(parn.getParent());
-				//out("parent of parent is "+parnparn.getParent());
-				//File targetDir = new File(parnparn.getParent());
-				File targetDir = parn;
-				 
-				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			    fc.setCurrentDirectory(targetDir);
-				//out("Setting selected file to "+parnparn.getPath());
-				// except this doesn't work
-				//fc.setSelectedFile(parnparn);
-				//fc.setSelectedFile(targetDir);
-				fc.ensureFileIsVisible(targetDir);
-			 
-			    //fc.setLocation(100,90);
-				 
-		    	fc.showOpenDialog(null);
-			 
-			 
-			    out("returned from show file chooser");
-			    //fm.setDir(fc.getCurrentDirectory());
-			    //fm.setFile(fc.getSelectedFile());
-			    String newPath = fc.getCurrentDirectory().getPath();
-			    String newName = fc.getSelectedFile().getName();
-			    if (newPath == null) {
-			    	newPath = new String ("none");
-			    }
-			    if (newName == null) {
-			    	newName = new String("none");
-			    }
-			    out("filechooser in GetDir returned directory "
-					 +newPath
-					 + "\\"
-					 +newName);
-			    
-			    if (newPath.compareTo(("none")) == 0) {
-			    	out("MakeYorNFile: no new path specified for getMoveToPath");
-			    	return;
-			    }
-			    
-			    StringBuffer toPathBuf = new StringBuffer(newPath);
-			    toPathBuf.insert(0, "\"");
-			    toPathBuf.append("\\");
-			    toPathBuf.append(newName);
-			    toPathBuf.append("\"");
-			    String toPath = toPathBuf.toString();
-			    fm.setMoveToPath(toPath);
-				
-				
-				
-			}
-			//-----------------------------------------------------------------------------------
-			// NOTE: this is clone of "setMoveDir" and probably one routine, a bit more generic,
-			// could do both functions...
-			public void setCopyDir(String mpath) {
-				out("set target directory for 'copy' cmd, dir WAS '"+mpath+"'");
-				 JFileChooser fc = new JFileChooser()
-				 {
-					 protected JDialog createDialog(Component parent) throws HeadlessException {
-					    JDialog dialog = super.createDialog(parent);
-					    // …
-					    //Point p = calculateCenter(dialog);
-					    dialog.setLocation(10,20);
-					    return dialog;
-					 }
-				  };
-				 out("MakeFileOrNPanel: remote object about to create a new blank file chooser, but did we leave off somewhere?");
-				 String lyne = mpath;
-				
-				 String oldPath = fm.getCopyToPath();
-				 if (oldPath == null) {
-					 oldPath = "c:\\temp";
-					 fm.setCopyToPath(oldPath);
-				 }
-				lyne = new String(fm.getCopyToPath());
-				out("setting chooser path to " + lyne);
-				File parn = new File(lyne);
-				
-				//out("parent of old path read in from file is "+parn.getParent());
-				//File parnparn = new File(parn.getParent());
-				//out("parent of parent is "+parnparn.getParent());
-				//File targetDir = new File(parnparn.getParent());
-				File targetDir = parn;
-				 
-				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			    fc.setCurrentDirectory(targetDir);
-				//out("Setting selected file to "+parnparn.getPath());
-				// except this doesn't work
-				//fc.setSelectedFile(parnparn);
-				//fc.setSelectedFile(targetDir);
-				fc.ensureFileIsVisible(targetDir);
-			 
-			    //fc.setLocation(100,90);
-				 
-		    	fc.showOpenDialog(null);
-			 
-			 
-			    out("returned from show file chooser");
-			    //fm.setDir(fc.getCurrentDirectory());
-			    //fm.setFile(fc.getSelectedFile());
-			    String newPath = fc.getCurrentDirectory().getPath();
-			    String newName = fc.getSelectedFile().getName();
-			    if (newPath == null) {
-			    	newPath = new String ("none");
-			    }
-			    if (newName == null) {
-			    	newName = new String("none");
-			    }
-			    out("filechooser in GetDir returned directory "
-					 +newPath
-					 + "\\"
-					 +newName);
-			    
-			    if (newPath.compareTo(("none")) == 0) {
-			    	out("MakeYorNFile: no new path specified for getCopyToPath");
-			    	return;
-			    }
-			    
-			    			    
-			    StringBuffer toPathBuf = new StringBuffer(newPath);
-			    toPathBuf.insert(0, "\"");
-			    toPathBuf.append("\\");
-			    toPathBuf.append(newName);
-			    toPathBuf.append("\"");
-			    String toPath = toPathBuf.toString();
-			    fm.setCopyToPath(toPath);
-				
-				
-				
-			}
-			*/
+
 	}
 		
 

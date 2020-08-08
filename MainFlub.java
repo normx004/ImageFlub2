@@ -6,6 +6,7 @@ import java.util.Timer;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import java.awt.*;
+import java.awt.List;
 import java.awt.event.*;
 import java.awt.image.*;
 import java.io.*;
@@ -65,8 +66,8 @@ same env as SERVER but
 	 */
 
 	
-	
-	
+	static final String AltCopy = new String("AltCopy");
+	static final String AltMove = new String("AltMove");
 
 	String arg0 = null;
 	
@@ -165,8 +166,16 @@ same env as SERVER but
 	public  void   setButtPanel(JPanel buttPanel) {this.buttPanel = buttPanel;}
 
 	private File dir_ = null;
-	public  File getDir()       { return dir_;}
-	public  void setDir(File f) { dir_= f;}
+	public  File getDir()       { 
+		if (dir_ == null) {
+			out("no dir set currently");
+		} else {
+		out("provding current dir: " + dir_.getPath());
+		}
+		return dir_;}
+	public  void setDir(File f) { 
+		out("setting current dir: " + f.getPath());
+		dir_= f;}
 	
 	private GetDir dirObj = null;
 	public  GetDir getDirObj() {					return dirObj;	}
@@ -197,7 +206,7 @@ same env as SERVER but
 	boolean firstTime = true;   
 	public boolean isFirstTime() {		return firstTime;}
 	public void setFirstTime(boolean firstTime) {this.firstTime = firstTime;}
-	
+	//--------------------Target PATHS------------------------------------------------
 	private String moveToPath = null;
 	public String getMoveToPath()                  {return moveToPath;}
 	public void   setMoveToPath(String moveToPath) {
@@ -210,6 +219,22 @@ same env as SERVER but
 		out("Setting copy-to path to " + copyToPath);
 		this.copyToPath = copyToPath;}
 	
+	private String altCopyToPath = null;
+	private String altMoveToPath = null;
+	public String getAltCopyToPath() {
+		return altCopyToPath;
+	}
+	public void setAltCopyToPath(String altCopyToPath) {
+		this.altCopyToPath = altCopyToPath;
+	}
+	public String getAltMoveToPath() {
+		return altMoveToPath;
+	}
+	public void setAltMoveToPath(String altMoveToPath) {
+		this.altMoveToPath = altMoveToPath;
+	}
+	
+	
 	
 	//--------------------------------------BUILDYORNFRAME----------------------------------
 	
@@ -218,7 +243,9 @@ same env as SERVER but
 		    JFrame f = null;
 		   
 		    // Create a New Frame, add a window listener
-	    	f = new JFrame("Keep, Discard or Move File Controls");
+		    String fTitle = new String( "Keep, Discard or Move File Controls from " + this.getDir().getPath());
+		    out("buidYornFrame: new frame title is "+fTitle);
+	    	f = new JFrame(fTitle);
 	    	f.addWindowListener(new WindowAdapter(){	        	
 	             public void windowClosing(WindowEvent e) {
 	            	 popDeleteRunner();
@@ -239,6 +266,17 @@ same env as SERVER but
 	        setNefCheck(jcb);
 	        bpan.add(jcb);
 	        
+	        JButton undo = new JButton("undo");
+	        undo.addActionListener(new ActionListener() { 
+	            public void actionPerformed(ActionEvent e) { 
+	                //popDeleteRunner();
+	                //System.exit(0);
+	            	undoit();
+	            	out("&&&&&&&&&&&&&&&&&&&want to undo last move or delete&&&&&&&&&&&&&&&&&&&&");
+	            } 
+	        });
+	        bpan.add(undo);
+	        
 	        JButton runDelete = new JButton("run delete?");
 	        runDelete.addActionListener(new ActionListener() { 
 	            public void actionPerformed(ActionEvent e) { 
@@ -254,7 +292,7 @@ same env as SERVER but
 	        f.setLocation(600, 900);
 	        //f.setLocation(60,100);
 	        //Dimension d = new Dimension(500,200);
-	        f.setSize(900,100);
+	        f.setSize(1300,100);
 	        f.setVisible(true);
 	        setYornFrame(f);
 	
@@ -362,9 +400,27 @@ same env as SERVER but
         			System.out.println("Must be cancel");
         		}
         }
-             
-         
-      
+    }    
+        void undoit() {
+        	
+        	// in a DOS shell, this works:
+        	//  "c:\\Program Files\\Git\\usr\\bin\\bash" /q/bin/chopIt.bash /q/temp/delum.bat
+        	//
+        	    String       cmdString2 = new String("q:\\bin\\chopIt.bash");
+        	    String       cmdString3 = new String("/q/temp/delum.bat");
+        	    String       cmdString1 = new String("c:\\Progra~1\\Git\\usr\\bin\\bash ");
+        	    ArrayList<String> cmdList = new ArrayList<String>();
+        	    cmdList.add(cmdString1);
+        	    cmdList.add(cmdString2);
+        	    cmdList.add(cmdString3);
+        	    
+        	    //cmdStringB.append(" /q/bin/chopIt.bash /q/temp/delum.bat");
+        	    System.out.println("THIS IS THE UNDOIT");
+            	
+            	TryProcessBuilder tp = new TryProcessBuilder();
+            	tp.doit(cmdList);
+            	
+        
     }
 	//---------------------------SETUP-----------------------------------------
 	// find the place to start looking at files- either from the first

@@ -62,10 +62,14 @@ private String getThePath() {
 	 // except this doesn't work
 	 fc.setSelectedFile(parnparn);
 	 //fc.setSelectedFile(targetDir);
+	 
 	 fc.ensureFileIsVisible(targetDir);
  
- //fc.setLocation(100,90);
-	 
+ fc.setLocation(1800,90);
+ Component cpnt =  fc.getParent();
+ Class cpntclass = cpnt.getClass();
+ out("ok, file chooser parent is a "+cpntclass.toString());
+ //cpnt.setAlwaysOnTop(true);
  fc.showOpenDialog(null);
  
  
@@ -115,7 +119,13 @@ public String getNextFilePath( String fn) throws java.rmi.RemoteException {
 				System.out.println("RemoteChooserServer: Have Located registry");
 				registry.bind("RemoteChooser", stub);
 				System.out.println("RemoteChooserServer: Server Ready");
-			} catch (Exception e) {
+			}
+			 catch (java.rmi.AlreadyBoundException e) {
+					System.err.println("RemoteChooserServer: Remote chooser already bound to registry...can continue: " +e.getMessage());
+					e.printStackTrace(System.err);
+					//System.exit(1);
+			}
+			 catch (Exception e) {
 				System.err.println("RemoteChooserServer: Error in main of server class: " +e.getMessage());
 				e.printStackTrace(System.err);
 				System.exit(1);

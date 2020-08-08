@@ -13,7 +13,6 @@ public class WindowPositioner {
     private Properties properties;
     private MainFlub flub = null;
     private int xVal = 0;
-    
     private int yVal = 0; 
     
     private void out (String s) {

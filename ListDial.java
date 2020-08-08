@@ -27,6 +27,12 @@ public class ListDial {
         dialog.setTitle(title);
     }
     private void out(String s){System.out.println(s);}
+    
+    public int getHeight() {
+    	int h = dialog.getHeight();
+    	return h;
+    }
+    
     private void createAndDisplayOptionPane(){
         setupButtons();
         JPanel pane = layoutComponents();
@@ -80,6 +86,10 @@ public class ListDial {
     }
 
     public void show(){ dialog.setVisible(true); }
+    
+    public void show(int x, int y){
+    	dialog.setLocation(x,y);
+    	dialog.setVisible(true); }
 
     private void hide(){ dialog.setVisible(false); }
 
