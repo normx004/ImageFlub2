@@ -32,23 +32,27 @@ public class RemoteChooserServer implements RemoteChooser {
 			
 		} // end constructor
 
-private void out(String s) { System.out.println(s);}
+private void out(String s) { 
+	String t = new String("RemoteChooserServer: ");
+	System.out.println(t + s);}
 		
 			
 //------------------------------GET THE PATH------------------------------------
 private String getThePath() {
+	 out("Entered 'getThePath' - no args");
 	 JFileChooser fc = new JFileChooser() {
 		 protected JDialog createDialog(Component parent) throws HeadlessException {
 			 JDialog dialog = super.createDialog(parent);
-			 dialog.setLocation(10,20);
+			 out("createDialog is Setting location for NEW JFileChooser at 1300,20");
+			 dialog.setLocation(1300,20);
 			 return dialog;
 		 }
      };
-	 out("RemoteChooserServer: remote object about to create a new blank file chooser, but did we leave off somewhere?");
+	 out("remote object about to create a new blank file chooser, but did we leave off somewhere?");
 	 String lyne = gd.getLastFileRead();
 	
 	File parn = new File(lyne);
-	out("RemoteChooserServer: parent of old path read in from file is "+parn.getParent());
+	out("parent of old path read in from file is "+parn.getParent());
 	File parnparn = new File(parn.getParent());
 	out("RemoteChooserServer: parent of parent is "+parnparn.getParent());
 	File targetDir = new File(parnparn.getParent());
@@ -58,26 +62,30 @@ private String getThePath() {
 	 imageflubber.FileSystemView myFSV = new imageflubber.FileSystemView();
 	 fc.setFileSystemView(myFSV);
 	 fc.setFileFilter(new ImageFilter());
-	 out("RemoteChooserServer: Setting selected file to "+parnparn.getPath());
+	 out("Setting selected file to "+parnparn.getPath());
 	 // except this doesn't work
 	 fc.setSelectedFile(parnparn);
 	 //fc.setSelectedFile(targetDir);
-	 
 	 fc.ensureFileIsVisible(targetDir);
  
- fc.setLocation(1800,90);
+ Class cpntclass = null;
  Component cpnt =  fc.getParent();
- Class cpntclass = cpnt.getClass();
- out("ok, file chooser parent is a "+cpntclass.toString());
+ if (cpnt != null) {
+	 cpntclass = cpnt.getClass();
+	 out("ok, file chooser parent is a "+cpntclass.toString());
+ }
+ 
  //cpnt.setAlwaysOnTop(true);
  fc.showOpenDialog(null);
+ out("After showOpenDialog, moving dialog to 1300,90");
+ fc.setLocation(1500,90);
  
  
- out("RemoteChooserServer: returned from show file chooser");
+ out("returned from show file chooser");
  //fm.setDir(fc.getCurrentDirectory());
  //fm.setFile(fc.getSelectedFile());
  
- out("RemoteChooserServer: filechooser in GetDir returned directory "
+ out("filechooser in GetDir returned directory "
 		 +fc.getCurrentDirectory().getPath()
 		 + ", file: "
 		 +fc.getSelectedFile().getName());
@@ -88,21 +96,21 @@ private String getThePath() {
 public String getNextFilePath( String fn) throws java.rmi.RemoteException {
 	  File f = new File (fn);
 	  String result = getThePath();
-	  out("RemoteChooserServer: this is the remote obj,  got back '"+result+"'");
+	  out("this is the remote obj,  got back '"+result+"'");
       return result;
 }
 //-----------------------------MAIN-------------------------------------
 		public static void main (String args[]) {
 			  // protected void getProps(String ps){
-			System.out.println("RemoteChooserServer: USE:   java -classpath imageflubber.RemoteChooserServer.jar -p <propsfile> ");
-			System.out.println("RemoteChooserServer: Remote Chooser Server starting.............................");
+			System.out.println("USE:   java -classpath imageflubber.RemoteChooserServer.jar -p <propsfile> ");
+			System.out.println("Server starting.............................");
 			String ps = new String(args[1]);
-			System.out.println("RemoteChooserServer: props file name from args is "+ps);
+			System.out.println("props file name from args is "+ps);
 			Properties p = new Properties();
 			try {
 				p.load(new FileInputStream(ps));     
 			} catch (IOException e) {	    	 
-				System.err.println("RemoteChooserServer: Failed to read properties file " + ps + ", must quit!");
+				System.err.println("Failed to read properties file " + ps + ", must quit!");
 			    System.exit(1);
 			}
 			
