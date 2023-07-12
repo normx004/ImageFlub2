@@ -14,11 +14,23 @@ public class GenericButtonPanelFactory {
 	private   boolean debug = true;
 	public    boolean isDebug() {		return debug;	}
 	public    void    setDebug(boolean debug) {		this.debug = debug;}
+	
 	private   MainFlub  fm_ = null;
+	public MainFlub getFm_() {
+		return this.fm_;
+	}
+	public void setFm_(MainFlub fm) {
+		this.fm_ = fm;
+	}
+	
+	// variables use to decide which screen we're on in multi-display environment ("\Display0" = primary, "\Display1" = secondary, etc)
+	GraphicsConfiguration gc_ = null;
+	//String screenID_ = null;
 	
 	private MakeArbitraryPanel mapa = null;
 	
 	GenericButtonPanelFactory (MakeArbitraryPanel imap) {
+		// this object probably will not work from this contructor...
 		mapa = imap;
 	}
 	GenericButtonPanelFactory (MakeArbitraryPanel imap, MainFlub fm) {
@@ -37,13 +49,15 @@ public class GenericButtonPanelFactory {
 		public void mouseClicked(MouseEvent e)
 		{
 			event = e;
-			System.out.println("altcopy button clicked");
+			out("altcopy button clicked");
 			theButt = ((JButton)e.getComponent());			String buttName = ((JButton)e.getComponent()).getText();
+			gc_ = theButt.getGraphicsConfiguration();
+			
 			out("ok it is the '"+buttName+"' button");
-			System.out.println("so, button may be " + e.getButton());
+			out("so, button may be " + e.getButton());
 			int buttPressType = e.getButton();
 			if (buttPressType == MouseEvent.BUTTON1) {
-				System.out.println("....it was left button");
+				out("....it was left button");
 				// here's where we should write the 'move' line to the output cmd file
 				if (buttName.compareTo(MainFlub.AltCopy)==0) {
 					handleCopy();
@@ -55,16 +69,16 @@ public class GenericButtonPanelFactory {
 				return;
 			} else {
 				if (buttPressType == MouseEvent.BUTTON2) {
-					System.out.println("....it was center button");
+					out("....it was center button");
 					return;
 				} else {
 					if (buttPressType == MouseEvent.BUTTON3) {
-						System.out.println("....it was right button");
+						out("....it was right button");
 						if (buttName.compareTo(MainFlub.AltCopy)==0) {
-							handleSetAltCopyTarget(theButt);
+							handleSetAltMoveCopyTarget(MainFlub.AltCopy, theButt);
 						} else {
 							if (buttName.compareTo(MainFlub.AltMove)==0) {
-								handleSetAltMoveTarget(theButt);
+								handleSetAltMoveCopyTarget(MainFlub.AltMove, theButt);
 							}
 						} 
 				}		
@@ -77,17 +91,85 @@ public class GenericButtonPanelFactory {
 	  private void handleMove() {
 		  out("handleMove entered");
 	  }
+	  
+	  private void handleSetAltMoveCopyTarget(String moveCopy, JButton jb) {
+		  out("handleSetAltMoveCopyTarget ---------set " + moveCopy + " altcopy target to directory from alt list");
+		
+		//String screenID = getGraphicsConfiguration().getDevice().getIDstring();
+		fm_.setScreenID(gc_.getDevice().getIDstring());
+		out("handleSetAltCopyMoveTarget: screen ID is "+ fm_.getScreenID());
+		
+		Point pointy = jb.getLocationOnScreen();
+		out("button is at X:" + pointy.x + ", and Y:" + pointy.y);
+		
+		JList lizt = mf.getCopyList();
+		out("handleSetAltMoveCOpyTarget: assuming copy list...unless...");
+		if (moveCopy.compareTo(fm_.getAltcopy()) != 0) {
+			out("handleSetAltMoveCopyTarget: NO! it is the move list!!");
+			lizt = mf.getMoveList();
+		}
+  	    ListDial ld = new ListDial ("choose from these dirs", /*mf.getCopyList()*/ lizt, fm_);
+  	    int listDialHeight = ld.getHeight();
+  	    String st = new String("listDial height is "+listDialHeight);
+  	    out(st);
+  	    ld.setOnOk(e -> System.out.println("handleSetAltCopyMoveTarget: Chosen item: " + ld.getSelectedItem()));
+  	    // now want to find location of the selection buttons so can pop the dialog just above it
+  	    // instead of just centering it which is what the code currently does.
+  	    int    putMe = /*panelY*/ 1000 - listDialHeight - 10; // panelY hardcoded in MakeFileYornPanel - do same here
+  	    String nst   = new String("ackshun: new Y value for dialog is "+putMe);
+  	    out(nst);	    	    
+          //ld.show(panelX+50, putMe);
+  	    ld.show(pointy.x , putMe);
+  	    //String cpDir = fm.getCopyToPath();  // just does a file chooser, shold work as is
+  	    String cpDir = (String)ld.getSelectedItem();
+  	    out("WOW it worked, maybe, selected item was "+cpDir);
+  	    if (cpDir == null ) {
+  	    	out("uh oh...get the 'copy (or move) to path' from the popup but it was null");
+  	    	// treat it as a 'keep'
+  	    	return;
+  	    }
+  	    if (moveCopy.compareTo(MainFlub.AltCopy)==0) {
+  	      mf.setAltCopyToPath(cpDir);
+  	    } else
+  	    	if (moveCopy.compareTo(MainFlub.AltMove)==0) {
+  	    		mf.setAltMoveToPath(cpDir);
+  	    	} else {
+  	    		System.err.println("AAAAAGH move copy string for ListDial MUST BE 'move' or 'copy'");
+  	    		System.exit(1);
+  	    	}
+  	    String currentTip = jb.getToolTipText();
+  	    String a = new String("right-click to choose alt directory");
+  	    String b = new String("; now set to "+cpDir);
+  	    String ttip = null;
+  	    if ( currentTip == null) {
+  	    	ttip = new String(a);
+  	    } else {
+  	    	ttip = new String(a+b);
+  	    }
+  	    //ttip = new String("right-click to choose alt-move directory; now set to "+cpDir);
+  	    out("Setting alt " + moveCopy + " tool tip to "+ttip);
+ 	    jb.setToolTipText(ttip);
+	  }
+	  
+	  
+	  
+	  
+	  /*
 	  private void handleSetAltCopyTarget(JButton jb) {
 		  out("handleSetAltCopyTarget ---------set altcopy target to directory from alt list");
-  	    
-  	    ListDial ld = new ListDial ("choose from these dirs", mf.getCopyList());
+		
+		//String screenID = getGraphicsConfiguration().getDevice().getIDstring();
+		fm_.setScreenID(gc_.getDevice().getIDstring());
+		out("handleSetAltCopyTarget: screen ID is "+ fm_.getScreenID());
+  	    ListDial ld = new ListDial ("choose from these dirs", mf.getCopyList(), fm_);
   	    int listDialHeight = ld.getHeight();
   	    String st = new String("listDial height is "+listDialHeight);
   	    out(st);
   	    ld.setOnOk(e -> System.out.println("Chosen item: " + ld.getSelectedItem()));
   	    // now want to find location of the selection buttons so can pop the dialog just above it
   	    // instead of just centering it which is what the code currently does.
-  	    int    putMe = /*panelY*/ 1000 - listDialHeight - 10; // panelY hardcoded in MakeFileYornPanel - do same here
+  	    //     putMe = panelY, except it is hardcoded in MakeFileYorNPanel; so do same here
+  	    int    putMe = 1000 - listDialHeight - 10; // panelY hardcoded in MakeFileYornPanel - do same here
   	    String nst   = new String("ackshun: new Y value for dialog is "+putMe);
   	    out(nst);	    	    
           //ld.show(panelX+50, putMe);
@@ -114,14 +196,19 @@ public class GenericButtonPanelFactory {
   	    out("Setting alt-move tool tip to "+ttip);
  	    jb.setToolTipText(ttip);
 	  }
+	
 	  private void handleSetAltMoveTarget(JButton jb) {
 		out("handleSetAltMoveTarget entered");
-		ListDial ld = new ListDial ("choose from these dirs", mf.getMoveList());
+		fm_.setScreenID(gc_.getDevice().getIDstring());
+		out("handleSetAltCopyTarget: screen ID is "+ fm_.getScreenID());
+		
+		ListDial ld = new ListDial ("choose from these dirs", mf.getMoveList(), fm_);
   	    int listDialHeight = ld.getHeight();
   	    String st = new String("ackshun: listDial height is "+listDialHeight);
   	    out(st);
   	    ld.setOnOk(e -> System.out.println("Chosen item: " + ld.getSelectedItem()));
-  	    int    putMe = /*panelY*/ 1000 - listDialHeight - 10; // panelY hardcoded in MakeFileYornPanel - do same here
+  	    //     putMe = panelY, except it is hardcoded in MakeFileYorNPanel; so do same here
+  	    int    putMe =  1000 - listDialHeight - 10; // panelY hardcoded in MakeFileYornPanel - do same here
   	    //String nst = new String("ackshun: new Y value for dialog is "+putMe);
   	    //out(nst);	 
   	    
@@ -139,6 +226,10 @@ public class GenericButtonPanelFactory {
   	    jb.setToolTipText(ttip);
 	  }
 	}
+     */
+	  
+	}
+	  
 	//----------------------GETBUTTONS-------------------------------------------
 	public JPanel getButtons(String borderTitle, String[] labels) {
 		setDebug(MainFlub.isStaticDebug());
@@ -241,12 +332,7 @@ public class GenericButtonPanelFactory {
 		    	i += 1;
 		    }
 	 }
-	public MainFlub getFm_() {
-		return fm_;
-	}
-	public void setFm_(MainFlub fm_) {
-		this.fm_ = fm_;
-	}
+	
 	
  }
 

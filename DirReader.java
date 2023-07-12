@@ -156,14 +156,15 @@ public class DirReader {
 	    	    }
                 
 			 	int    i = s.lastIndexOf('.')+1;
-			 	//out("String of next file is " + s + ", last dot is "+ i + ", length is " + s.length());
+			 	out("String of next file is " + s + ", last dot is "+ i + ", length is " + s.length());
 			 	String tail = s.substring(i, s.length());
 			 	if ( tail.compareToIgnoreCase("jpg")==0 ||
 			 		 tail.compareToIgnoreCase("png")==0 ||
 			 		 tail.compareToIgnoreCase("jpeg")== 0 ||
+			 		 tail.compareToIgnoreCase("webp")== 0 ||
 			 		 tail.compareToIgnoreCase("bmp")==0){
 			 
-			 			//out("OK its a type we like");
+			 			out("OK its a type we like");
 			 			if (!okToAdd) {
 			 				//out("looking for "+fname+", right now got "+s);
 			 			}

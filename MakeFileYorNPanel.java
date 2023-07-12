@@ -127,6 +127,9 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 		 	int panelX = p.getX();
 		 	int panelY = p.getY();
 		 	
+		 	out("asked for panel location, x is " + panelX + ", y is " + panelY);
+		 	Graphics2D01 ghw = new Graphics2D01();
+		 	out("ok, screen dimensions are "+ghw.getWidthx() + ", "+ ghw.getHeightx());
 		 	//ok, just hard code it for now
 		 	panelX = 600;
 		 	panelY = 1000;
@@ -379,10 +382,13 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 						+ lia.getFilesSaved() 
 						+")   ( deleted: "
 						+ lia.getFilesDeleted()
-						+")   ( bytes deleted: "
-						+ this.digestSize(lia.getBytesDeleted())
 						+")   ( moved: "
 						+ lia.getFilesMoved()
+						+")   ( copied: "
+						+ lia.getFilesCopyed()
+						+")   ( bytes deleted: "
+						+ this.digestSize(lia.getBytesDeleted())
+						
 						+ ")"
 						);
 			 return bTitle;

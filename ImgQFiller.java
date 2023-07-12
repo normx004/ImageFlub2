@@ -18,7 +18,10 @@ public class ImgQFiller extends Thread {
      
      public ImgQFiller (MainFlub x) {
     	 fm = x;
-    	 out("Constructing image q filler");	 
+    	 out("Constructing image q filler");
+    	 if (fm == null) {
+    		 out("Uh oh, the constructor got a 'null' MainFlub argument");
+    	 }
     	 myLbq   = fm.getMyLbq();
     	 out("in imgqfiller constructor, myLbq   is "+myLbq.toString());
      }

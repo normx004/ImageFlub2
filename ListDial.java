@@ -14,19 +14,21 @@ public class ListDial {
     private JButton okButton, cancelButton;
     private ActionListener okEvent, cancelEvent;
     private JDialog dialog;
+    MainFlub fm_ = null;
 
-    public ListDial(String message, JList<String> listToDisplay){
+    public ListDial(String message, JList<String> listToDisplay, MainFlub fm){
+    	fm_ = fm;
         list = listToDisplay;
         label = new JLabel(message);
         createAndDisplayOptionPane();
     }
 
 
-    public ListDial(String title, String message, JList<String> listToDisplay){
-        this(message, listToDisplay);
+    public ListDial(String title, String message, JList<String> listToDisplay, MainFlub fm){
+        this(message, listToDisplay, fm);
         dialog.setTitle(title);
     }
-    private void out(String s){System.out.println(s);}
+    private void out(String s){System.out.println("ListDial: "+s);}
     
     public int getHeight() {
     	int h = dialog.getHeight();
@@ -96,8 +98,9 @@ public class ListDial {
     public Object getSelectedItem(){ return list.getSelectedValue(); }
     
    public static void main (String args[]) {
+	MainFlub fm = null;
    	JList<String> list = new JList<String>(new String[] {"foo", "bar", "foobar"});
-        ListDial dialog = new ListDial("Copy or Move to : ", list);
+        ListDial dialog = new ListDial("Copy or Move to : ", list, fm);
         dialog.setOnOk(e -> System.out.println("Chosen item: " + dialog.getSelectedItem()));
         dialog.show();
  

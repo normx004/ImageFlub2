@@ -128,6 +128,9 @@ package imageflubber;
 	    public void scaleIt() {
 	    	boolean DOIT = false;
 	    	if (DOIT) {
+	    		// check height / width we ahve to work with
+	    		Graphics2D01 g = new Graphics2D01();
+	    		//Rectangle bounds = g.getDeviceConfiguration().getBounds();
 	    	// Create new (blank) image of required (scaled) size
 	    	int width = 1200;
 	    	int height = 800;
@@ -171,7 +174,8 @@ package imageflubber;
 	    	//out ("done with ratio scale for fixed .25");
 	    }
 	    public void scaleItRatio(float rat) {
-	    	//out ("doing a 'scale it ratio' with input ratio "+rat);
+	    	out ("doing a 'scale it ratio' with input ratio "+rat);
+	    	Graphics2D01 g = new Graphics2D01();
 	    	try {
 	    		BufferedImage thumbnail = Thumbnails.of(img).scale(rat).asBufferedImage();
 	    		img = thumbnail;
@@ -243,7 +247,11 @@ package imageflubber;
 		       } catch ( NullPointerException npe) {
 		    	   System.err.println("--------------must be invalid image!!!!!!!");
 		    	   npe.printStackTrace(System.err);
-		    	   throw npe;
+		    	   throw npe;}
+		       catch ( java.lang.IllegalArgumentException iae) {
+			    	   System.err.println("--------------must be invalid image!!!!!!!");
+			    	   iae.printStackTrace(System.err);
+			    	   //throw iae;
 		       }       
 		       
               uncout("+++++++++exiting LoadImageApp(file) construtor, img number " + this.getThisFileNumberInList() + " of " + this.getFilesInDirCount());

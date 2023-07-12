@@ -6,7 +6,8 @@ import java.io.*;
 //mport javafx.application.*;
 
 class TryProcessBuilder  {
-	  private String cmd_ = new String("start q:\\bin\\RunQdoit.bat");
+	  private String cmdx_ = new String("start q:\\temp\\RunQdoit.bat");
+	  private String cmd_ = cmdx_.replace('z', ' ');
 	  //private String cmd_ = new String("start c:\\temp\\test.bat");
       public void out(String s) {
          System.out.println("TryProcessBuilder: " + s);

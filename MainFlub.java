@@ -67,8 +67,14 @@ same env as SERVER but
 
 	
 	static final String AltCopy = new String("AltCopy");
+	public static String getAltcopy() {
+		return AltCopy;
+	}
 	static final String AltMove = new String("AltMove");
 
+	public static String getAltmove() {
+		return AltMove;
+	}
 	String arg0 = null;
 	
 	private String PositionFile = "C:\\temp\\FlubWindowPosition.txt";
@@ -89,7 +95,15 @@ same env as SERVER but
 		this.windowPositioner = windowPositioner;
 	}
 	
-
+	String screenID = null;
+	public String getScreenID() {
+		return screenID;
+	}
+	public void setScreenID(String screenID) {
+		this.screenID = screenID;
+	}
+	
+	
 	private JFrame yornFrame = null;
 	public JFrame  getYornFrame() {return yornFrame;	}
 	public void    setYornFrame(JFrame yornFrame) {this.yornFrame = yornFrame;	}
@@ -311,8 +325,8 @@ same env as SERVER but
 		    	JFrame z = getFrayme();
 		    	out("DOIT LOCAL - calling window location save function");
 		    	// call frame position retrieval function
-		    	wp = getWindowPositioner();
-		    	wp.save(z);
+		    	//wp = getWindowPositioner();
+		    	//wp.save(z);
 		    	out("DOIT LOCAL - Just saved window position");
 		    	z.setVisible(false);
 		    	z.dispose();
@@ -499,7 +513,7 @@ same env as SERVER but
 		               //load a properties file
 		    		prop.load(new FileInputStream(pr));		 
 		               //get the property value and print it out
-		            System.out.println(prop.getProperty("debug"));
+		            out(prop.getProperty("debug"));
 		            d = prop.getProperty("debug");
 		  		    if ( d != null ) {
 		  		      if (d.compareToIgnoreCase("true")==0) {
@@ -531,7 +545,7 @@ same env as SERVER but
 		  		    	out("list of copy-to directories is "+this.getCopyListString());
 		  		    	setCopyList(GetMoveCopyTarget.getListFromProps(this.getCopyListString(), altDelim));
 		  		    }
-		    		System.out.println(prop.getProperty("imbuf"));
+		    		out(prop.getProperty("imbuf"));
 		    		i = prop.getProperty("imbuf");
 		  		    if ( i != null ) {
 		  			  Integer ib = new Integer(i);

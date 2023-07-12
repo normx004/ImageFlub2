@@ -16,12 +16,21 @@ public class WindowPositioner {
     private int yVal = 0; 
     
     private void out (String s) {
-    	System.out.println("WindowPositioner: "+s);
+    	try {
+    		out("WindowPositioner: "+s);
+    	} catch (java.lang.StackOverflowError e) {
+    		System.err.println("Uh Oh, stack overflow "+ e.toString());
+    		e.printStackTrace();
+    	} catch (java.lang.Exception ee) {
+    		System.err.println("uncaugut exception!!!!!!");
+    		ee.printStackTrace();
+    	}
     }
 
     public WindowPositioner( String filename, MainFlub fptr )
     {
         this.filename = filename;
+        out(" filename to use for position is "+filename);
         this.flub = fptr;
     }
 
@@ -29,8 +38,10 @@ public class WindowPositioner {
     {
         //key = key + c.getName();
     	key = key + "frame0";
+    	out("Key is "+key);
 
         String position = properties.getProperty( key );
+        out("Position is \'" + position + "\'");
         //if (c.getName() == null) {
         	//out("Uh oh, in window positioner, component name is null");
        // } else {
@@ -53,6 +64,8 @@ public class WindowPositioner {
             Container container = (Container) c;
             for ( Component child : container.getComponents() )
                setBounds( key, child );
+        } else {
+        	out("ok, c was NOT a container");
         }
     }
 
@@ -100,10 +113,11 @@ public class WindowPositioner {
 
     private void getBounds( String key, Component c )
     {
-    	out("CALLED GETBOUNDS, component is "+c.getName());
+    	out("GETBOUNDS was called, component is "+c.getName());
         key = key + c.getName();
         
         String position = String.format( "%d,%d,%d,%d", c.getX(), c.getY(), c.getWidth(), c.getHeight() );
+        out ("position calculated as "+ position);
         this.setxVal(c.getX());
         this.setyVal(c.getY());
         out("New Position is x "+c.getX()+", y "+c.getY());
@@ -121,7 +135,7 @@ public class WindowPositioner {
 
     public void save( Component component )
     {
-    	out("CALLED SAVE");
+    	out("SAVE was called");
         Component top = component;
         while ( top.getParent() != null )
             top = top.getParent();

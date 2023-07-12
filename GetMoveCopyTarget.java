@@ -26,7 +26,7 @@ public class GetMoveCopyTarget {
     	} else {
     		if (mOrC.compareToIgnoreCase("copy") == 0) {
     			//no change
-    			out("GetMoveCopyTarget: workign on a copy");
+    			out("GetMoveCopyTarget: working on a copy");
     		} else {
     			System.err.println("uh oh, undecipherable argement to GetMoveOrCopyTarget: " + mOrC);
     			System.exit(1);
@@ -51,7 +51,7 @@ public class GetMoveCopyTarget {
 		 {
 			 protected JDialog createDialog(Component parent) throws HeadlessException {
 			    JDialog dialog = super.createDialog(parent);
-			    // …
+			    // ï¿½
 			    //Point p = calculateCenter(dialog);
 			    dialog.setLocation(10,20);
 			    return dialog;

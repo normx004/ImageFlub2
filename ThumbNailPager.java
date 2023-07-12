@@ -58,6 +58,8 @@ public class ThumbNailPager {
 		iV.add(new String("c:\\temp\\test\\img120.jpg"));
 		tnp.addThumbs(iV);
 		tnp.writeCanvas("c:\\temp\\test\\Canvas.png");
-		
+	    try {
+		Thread.sleep(100);
+	    } catch (InterruptedException e) {;}
 	}
 }
