@@ -44,38 +44,34 @@ class TryProcessBuilder  {
     	  
     	  try {
               // Change to the directory where your shell script is located
-              ProcessBuilder pb = new ProcessBuilder("bash", "-c", "cd /tmp && chmod 777 delum.bat");
+              ProcessBuilder pb = new ProcessBuilder("bash", "-c", "cd /tmp && chmod 777 delum.bash && /tmp/delum.bash");
               Process p = pb.start();
-
               // Wait for the script to finish executing
               int exitCode = p.waitFor();
-
               if (exitCode == 0) {
-                  System.out.println("Shell script executed successfully!");
+                  System.out.println("Shell script executed successfully! A");
               } else {
                   System.err.println("Shell script execution failed with exit code: " + exitCode);
               }
+             
+              
+              out("now gonna read output from delum process");
+              InputStream inputStream = p.getInputStream();
+              BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+              StringBuilder output = new StringBuilder();
+              String line;
+              while ((line = reader.readLine()) != null) {
+            	  out("from delum: "+line);
+                  //output.append(line).append("\n");
+              }
+              out("Finished reading");
+             
           } catch (IOException | InterruptedException e) {
               e.printStackTrace();
           }
     	  
     	  
-    	  try {
-              // Change to the directory where your shell script is located
-              ProcessBuilder pb = new ProcessBuilder("bash", "-c", "cd /tmp && ./delum.bat");
-              Process p = pb.start();
-
-              // Wait for the script to finish executing
-              int exitCode = p.waitFor();
-
-              if (exitCode == 0) {
-                  System.out.println("Shell script executed successfully!");
-              } else {
-                  System.err.println("Shell script execution failed with exit code: " + exitCode);
-              }
-          } catch (IOException | InterruptedException e) {
-              e.printStackTrace();
-          }
+    	 
       }
     	  
   
