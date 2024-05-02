@@ -247,6 +247,13 @@ same env as SERVER but
 	public void setAltMoveToPath(String altMoveToPath) {
 		this.altMoveToPath = altMoveToPath;
 	}
+	public boolean isWindows = false;
+	public boolean isWindows() {
+			 WorLinux w = new WorLinux();
+			 isWindows = w.izzit();
+		return isWindows;
+	}
+	
 	
 	
 	
@@ -415,8 +422,10 @@ same env as SERVER but
         		}
         }
     }    
-        void undoit() {
-        	
+        
+    //************************undoit***************************
+    void undoit() {
+        	if (isWindows()) {     	
         	// in a DOS shell, this works:
         	//  "c:\\Program Files\\Git\\usr\\bin\\bash" /q/bin/chopIt.bash /q/temp/delum.bat
         	//
@@ -433,7 +442,10 @@ same env as SERVER but
             	
             	TryProcessBuilder tp = new TryProcessBuilder();
             	tp.doit(cmdList);
-            	
+        }
+        else {
+        	  JOptionPane.showMessageDialog(null, "NO undoit in Linux (yet...)", "TRIED UNDOIT",JOptionPane.PLAIN_MESSAGE );            
+        }   	
         
     }
 	//---------------------------SETUP-----------------------------------------
@@ -494,6 +506,15 @@ same env as SERVER but
 				 isx +=1 ;
 			 }
 		 }
+		 
+		 boolean isWin = this.isWindows();
+		 if (! isWin ) {
+		     setCmdFilePath("/tmp/delum.bat");
+		 }
+		 
+		 
+		 
+		 
 		 Properties p = System.getProperties();
 		  String d = p.getProperty("debug");
 		  if ( d != null ) {

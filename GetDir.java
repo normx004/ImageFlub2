@@ -42,17 +42,17 @@ public class GetDir  {
 
 	private MainFlub fm = null;
 	public void out(String s) { 
-		outAll(s);
+		//outAll(s);
 		if (fm == null ) {
-			System.out.println("GetDir: "+s);
+			System.out.println("GetDirA: "+s);
 			return;
 		}
 		if (fm.isDebug()/*|| true)*/) {
-			System.out.println("GetDir: "+s);
+			System.out.println("GetDirB: "+s);
 		}
 	}
 	public void outAll(String s) {
-		System.out.println("GetDir: "+s);
+		System.out.println("GetDirC: "+s);
 	}
 	
 	public GetDir(MainFlub afm) {
@@ -198,6 +198,7 @@ public class GetDir  {
 	}
 	
 public String getLastFileRead() {
+	    boolean isWindows = fm.isWindows();
 	    boolean done = false;
 		boolean ok = false;
 		int times = 0;
@@ -206,30 +207,60 @@ public String getLastFileRead() {
 		String lastDirPath = null;
 		File batf = null;
 		String lyne = null;
-		while (!done && times < 2) {
-			String dval = drive[times];
-		    String readFilePath    = new String(dval +"\\temp\\lastGoodFile.txt");
-		    outAll("GetDir: getLastFileread Looking for "+readFilePath);
-		    batf   = new File(readFilePath);
-		
-			try {
-				FileReader fin = new FileReader(batf);
-				BufferedReader br = new BufferedReader(fin);
-			    lyne = br.readLine();
-				fin.close();
-				outAll("GetDir: Read  "+lyne);
-				done = true;
-				ok = true;
-			} catch (Exception e) {
-				System.err.println("GetDir: LastGoodFile read exception "+e.getMessage());
-				//e.printStackTrace(System.err);
-			}
-			times += 1;
-		} // while ! done
-		if ( !ok) {
-			System.err.println("GetDir: Uh Oh, failed to read to "+ batf.getPath());
+		String readFilePath = null;
+		if ( isWindows) {
+		  while (!done && times < 2) {
+		  	  String dval = drive[times];
+		      readFilePath    = new String(dval +"\\temp\\lastGoodFile.txt");
+		      outAll("GetDir: getLastFileread Looking for "+readFilePath);
+		      batf   = new File(readFilePath);
+		/*
+			  try {
+				  FileReader fin    = new FileReader(batf);
+				  BufferedReader br = new BufferedReader(fin);
+			      lyne = br.readLine();
+				  fin.close();
+				  outAll("GetDir: Read  "+lyne);
+				  done = true;
+				  ok   = true;
+			  } catch (Exception e) {
+				  System.err.println("GetDir: LastGoodFile read exception "+e.getMessage());
+				  //e.printStackTrace(System.err);
+			  }
+	     */
+		      lyne = getFilePath(batf);
+		      if ( lyne == null ) {
+		    	  ok = false;
+		      } else {
+		    	  done = true;
+		    	  ok   = true;
+		    	  out("setting 'done' to TRUE");
+		      }
+			  times += 1;
+		  } // while ! done
+		  if ( !ok) {
+			  System.err.println("GetDir: Uh Oh, failed to read to "+ batf.getPath());
+		  }
+		}  else {     //end of "if running on windows"; must be linux
+	       	readFilePath = new String("/tmp/lastGoodFile.txt");
+	       	batf         = new File(readFilePath);
+	       	lyne         = getFilePath(batf);
 		}
 		return lyne;
 	}
+private String getFilePath (File batf) {
+	  String lyne = null;
+	  try {
+		  FileReader fin    = new FileReader(batf);
+		  BufferedReader br = new BufferedReader(fin);
+	      lyne = br.readLine();
+		  fin.close();
+		  outAll("GetDir: from " + batf.getAbsolutePath()  + " I have Read  "+lyne);
+	  } catch (Exception e) {
+		  System.err.println("GetDir: LastGoodFile read exception "+e.getMessage());
+		  //e.printStackTrace(System.err);
+	  }
+	  return lyne;
+}
 	
 } // end class

@@ -38,6 +38,8 @@ package imageflubber;
 	    private int  filesInDirCount = 0;
 	    private int  thisFileNumberInList = 0;
 	    private int  remainingCount = 0;
+	    private double maxW = 0.0;
+	    private double maxH = 0.0;
 	    
 	    private int  filesSaved = 0;
 	    private int  filesDeleted = 0;	    
@@ -87,6 +89,8 @@ package imageflubber;
 			me.append("h " + originalH + ", w "+originalW + ", size "+originalSize + ", name "+theFile.getName() + " is "+ thisFileNumberInList + " of "+ filesInDirCount);
 			return me.toString();
 		}
+		public int screenWidth = 0;
+		public int screenHeight = 0;
         //-------------------------------------------------------
 	    public void paint(Graphics g) {
 	    	//super.paint(g);
@@ -119,16 +123,17 @@ package imageflubber;
         //-----------------------DEFAULT CONSTRUCTOR-------------------------------------
 	    public LoadImageApp() {
 	       try {
-	           img = ImageIO.read(new File("c:\\temp\\earthx.jpg"));
-	       } catch (IOException e) {
+	            img = ImageIO.read(new File("c:\\temp\\earthx.jpg"));
+	           } catch (IOException e) {
 	       }
 
 	    }
 	    
 	    public void scaleIt() {
+	    	out("entered 'scaleIt");
 	    	boolean DOIT = false;
 	    	if (DOIT) {
-	    		// check height / width we ahve to work with
+	    		// check height / width we have to work with
 	    		Graphics2D01 g = new Graphics2D01();
 	    		//Rectangle bounds = g.getDeviceConfiguration().getBounds();
 	    	// Create new (blank) image of required (scaled) size
@@ -149,7 +154,7 @@ package imageflubber;
 	    	}
 	    }
 	    public void scaleItfixed() {
-	    	//out("doing a 'scale it fixed' to 1200,800");
+	    	out("doing a 'scale it fixed' to 1200,800");
 	    	try {
 	    	     BufferedImage thumbnail = Thumbnails.of(img).size(1200, 800).asBufferedImage();
 	    	     img = thumbnail;
@@ -159,7 +164,7 @@ package imageflubber;
 	    	}
 	    }
 	    public void scaleItRatio() {
-	    	//out ("doing a 'scale it ratio' to .25");
+	    	out ("doing a 'scale it ratio' (no arguments) to .25");
 	    	try {
 	    		BufferedImage thumbnail = Thumbnails.of(img).scale(0.25f).asBufferedImage();
 	    		img = thumbnail;
@@ -174,12 +179,14 @@ package imageflubber;
 	    	//out ("done with ratio scale for fixed .25");
 	    }
 	    public void scaleItRatio(float rat) {
-	    	out ("doing a 'scale it ratio' with input ratio "+rat);
+	    	out ("doing a 'scale it ratio' (float) with input ratio "+rat);
 	    	Graphics2D01 g = new Graphics2D01();
 	    	try {
 	    		BufferedImage thumbnail = Thumbnails.of(img).scale(rat).asBufferedImage();
 	    		img = thumbnail;
-	    		//out("image has been scaled!");
+	    		int theWid = img.getWidth(null);
+		        int theHi = img.getHeight(null);
+	    		out("image has been scaled! and is now Wide: "+ theWid + ", High: "+theHi);
 	    	} catch (IOException ioe) {
 	    		System.err.println("io error: "+ioe.getMessage());
 	    		ioe.printStackTrace();
@@ -195,12 +202,29 @@ package imageflubber;
 	    public LoadImageApp(File4Img f)throws IIOException, NullPointerException {
 	    	   super();
 	    	   
+	    	   double maxW = 0.0; double maxH = 0.0;
+	    	   WorLinux worl = new WorLinux();
+	    	   boolean isWin = worl.izzit();
+	    	   if ( isWin ) {
+	    		   maxW = 1200;
+	    		   maxH = 800;
+	    	   } else {
+	    		   maxW = 700;
+	    		   maxH = 400;
+	    	   }
+	    	   out("for image " + f.getName() + ": maxWidth = "+(int)maxW+", max Height="+(int)maxH);
+	    	   
+	    	   Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+	    	   setScreenWidth ((int)screenSize.getWidth());
+	    	   setScreenHeight((int)screenSize.getHeight());
+	    	   
 	    	   setDebug(MainFlub.isStaticDebug());
-	    	   //setDebug(true);
+	    	   setDebug(true);
 	    	   out("+++++++++++entering LoadImageApp(file) constructor---------------" + f.getAbsolutePath() + " is to be loaded into img");
 	    	   setTheFile(f);
-	    	   this.setFilesInDirCount(f.getFilesInDirCount());
+	    	   this.setFilesInDirCount     (f.getFilesInDirCount());
 	    	   this.setThisFileNumberInList(f.getThisFileNumberInList());
+	    	   
 	    	   out("just created LIA with filename "+f.getName()+", number "+this.getThisFileNumberInList()+" of "+this.getFilesInDirCount());
 	    	   Thread t = Thread.currentThread();
 	    	   //t.dumpStack();
@@ -209,14 +233,13 @@ package imageflubber;
 		          
 		           int w = img.getWidth(null);
 		           int h = img.getHeight(null);
-		           //out("Loading img in (file) construcgture, H:    " + h);
-		           //out("Loading img in (file) construcgture, W:    " + w);
-		           //out("Loading img in (file) construcgture, size: " + f.length());
+		           out("Loading img in (file) construcgture, W:    " + w + ", H:    " + h +  ", file size: " + f.length());
 		           setOriginalW(w);
 		           setOriginalH(h);
 		           setOriginalSize(f.length());
 		           
-		           if ((w > 1200)|| h >800) {
+		           if ((w > maxW)|| h > maxH) {
+		        	   out("Image dimentions: "+w+","+h);
 		        	  
 		        	  //scale to 1200 if very wide or 800 if very high
 		        	  //but in no case get an image taller than 800
@@ -224,13 +247,13 @@ package imageflubber;
 		              double rat = 0.0;
 		              double wid = (double) w;
 		              double hig = (double) h;
-		              double scaleTo = 800;
-		              if ( hig > 800) {
-		            	//out("higher than 800 so scaling based on img width");
+		              double scaleTo = maxH;
+		              if ( hig > maxH) {
+		            	out("Taller than " + maxH + " so scaling based on img width");
 			            rat = scaleTo/hig;  
 		              } else {
-		            	//out("scaling based on img height");
-		            	scaleTo = 1200.0;
+		            	out("scaling based on img width");
+		            	scaleTo = maxW;
 		                rat = scaleTo/wid;
 		              } // end 'if wide or tall'
 		              scaleItRatio((float)rat);
@@ -263,15 +286,16 @@ package imageflubber;
 		             img = ImageIO.read(f);
 		             int w = img.getWidth(null);
 			         int h = img.getHeight(null);
-			         //out("Loading img in (file) loadNewImage,  H: " + h);
-			         //out("Loading img in (file) loadNewImage , W: " + w);
+			         out("Loading img in (file) loadNewImage,  H: " + h);
+			         out("Loading img in (file) loadNewImage , W: " + w);
 			         // if image is larger than 1200x800, scale it down
 			         // if landscape, scale width relative to 1200
-			         if (h < 1201 && w < 801) {
+			         if (w < maxW && h < getMaxH()) {
+			        	 out("no need to scale, I guess");
 			        	 return;
 			         }
 			         if (w > h) {
-			        	 if (w > 1200) {
+			        	 if (w > getMaxW()) {
 			        		 double rat = 0.25;
 			        		 double wid = (double) w;
 			        		 double scaleTo = 1200.0;
@@ -283,7 +307,7 @@ package imageflubber;
 			         }else{
 			        	 // if portrait scale height relative to 800
 			        	 if (h > w || h == w) {
-			        		 if (h > 800) {
+			        		 if (h > getMaxH()) {
 				        		 double rat = 0.25;
 				        		 double hi = (double) h;
 				        		 double scaleTo = 800.0;
@@ -344,5 +368,29 @@ package imageflubber;
 		}
 		public int getRemainingCount() {
 			return remainingCount;
+		}
+		public int getScreenWidth() {
+			return screenWidth;
+		}
+		public void setScreenWidth(int screenWidth) {
+			this.screenWidth = screenWidth;
+		}
+		public int getScreenHeight() {
+			return screenHeight;
+		}
+		public void setScreenHeight(int screenHeight) {
+			this.screenHeight = screenHeight;
+		}
+		public double getMaxW() {
+			return maxW;
+		}
+		public void setMaxW(double maxW) {
+			this.maxW = maxW;
+		}
+		public double getMaxH() {
+			return maxH;
+		}
+		public void setMaxH(double maxH) {
+			this.maxH = maxH;
 		}
 }

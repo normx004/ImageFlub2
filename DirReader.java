@@ -15,9 +15,12 @@ public class DirReader {
 	 MainFlub              fm = null;
 	 String[]           filez = null;
 	 private boolean beenHere = false;
+	 private boolean myLocalDebug = false;
 	 private int    nextCount = 0;
+	 
+	 
 	 //------------------------------------------------------------------------------------------
-	 private void out (String s) { if ( fm.isDebug()/*|| true*/) {	System.out.println("DirReader: " + s); }}
+	 private void out (String s) { if ( myLocalDebug) {	System.out.println("DirReader: " + s); }}
 	 private void uncout (String s) { 	System.out.println("DirReader: " + s); }
 	 //-------------------------------NEXTFILE------------------------------------
 	 public void  nextFile() {
@@ -114,12 +117,17 @@ public class DirReader {
 	 public DirReader(File f, MainFlub x) {
 		 fm = x;
 		 out("constructor1 with input file dir "+ f.getParent()+", and file name "+f.getName());
+		 myLocalDebug = fm.isDebug();
+		 myLocalDebug = false;
 		 getList(f.getParent(), f.getName());
+		
 	 }
 	 public DirReader(String dirName, MainFlub x)
 	  {
 		fm = x;
 		out("constructor2 with directory name only "+dirName);
+		myLocalDebug = fm.isDebug();
+		myLocalDebug = false;
 		getList(dirName, null);
 		
 	  }
@@ -156,7 +164,7 @@ public class DirReader {
 	    	    }
                 
 			 	int    i = s.lastIndexOf('.')+1;
-			 	out("String of next file is " + s + ", last dot is "+ i + ", length is " + s.length());
+			 	//out("String of next file is " + s + ", last dot is "+ i + ", length is " + s.length());
 			 	String tail = s.substring(i, s.length());
 			 	if ( tail.compareToIgnoreCase("jpg")==0 ||
 			 		 tail.compareToIgnoreCase("png")==0 ||
@@ -164,7 +172,7 @@ public class DirReader {
 			 		 tail.compareToIgnoreCase("webp")== 0 ||
 			 		 tail.compareToIgnoreCase("bmp")==0){
 			 
-			 			out("OK its a type we like");
+			 			//out("OK its a type we like");
 			 			if (!okToAdd) {
 			 				//out("looking for "+fname+", right now got "+s);
 			 			}

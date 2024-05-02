@@ -3,25 +3,84 @@ package imageflubber;
 import java.lang.*;
 import java.util.*;
 import java.io.*;
+import java.io.IOException;
 //mport javafx.application.*;
 
 class TryProcessBuilder  {
+	  private boolean isWindows = false;
 	  private String cmdx_ = new String("start q:\\temp\\RunQdoit.bat");
 	  private String cmd_ = cmdx_.replace('z', ' ');
 	  //private String cmd_ = new String("start c:\\temp\\test.bat");
       public void out(String s) {
          System.out.println("TryProcessBuilder: " + s);
       }
+      public void setW() {
+    	  WorLinux w = new WorLinux();
+    	  setIsWindows(w.izzit());
+      }
       public TryProcessBuilder() {
     	  out("Void constructor for TryProcessBuilder");
+    	  setW();
     	  //out("TryProcBld will execdute this command:"+cmd_);
       }
       public TryProcessBuilder(String newCmd) {
+    	setW();
       	cmd_ = newCmd;
       	out("TryProcBld: one-arg constructor");
       	out("TryProcBld will execdute this command:"+cmd_);
       }
       public void doit() {
+    	  out("no-arguments 'doit' entered");
+    	  if (getIsWindows()) {
+    		  out("doing it win");
+    		  doitWin();
+    	  } else {
+    		  out("doing it linux");
+    		  doitLinux();
+    	  }
+      }
+      public void doitLinux() {
+    	  out("Now in 'doitLinux'");
+    	  
+    	  try {
+              // Change to the directory where your shell script is located
+              ProcessBuilder pb = new ProcessBuilder("bash", "-c", "cd /tmp && chmod 777 delum.bat");
+              Process p = pb.start();
+
+              // Wait for the script to finish executing
+              int exitCode = p.waitFor();
+
+              if (exitCode == 0) {
+                  System.out.println("Shell script executed successfully!");
+              } else {
+                  System.err.println("Shell script execution failed with exit code: " + exitCode);
+              }
+          } catch (IOException | InterruptedException e) {
+              e.printStackTrace();
+          }
+    	  
+    	  
+    	  try {
+              // Change to the directory where your shell script is located
+              ProcessBuilder pb = new ProcessBuilder("bash", "-c", "cd /tmp && ./delum.bat");
+              Process p = pb.start();
+
+              // Wait for the script to finish executing
+              int exitCode = p.waitFor();
+
+              if (exitCode == 0) {
+                  System.out.println("Shell script executed successfully!");
+              } else {
+                  System.err.println("Shell script execution failed with exit code: " + exitCode);
+              }
+          } catch (IOException | InterruptedException e) {
+              e.printStackTrace();
+          }
+      }
+    	  
+  
+      public void doitWin() {
+    	   out("now in 'doitWin");
            List<String> cmds = new ArrayList<String>();
            cmds.add("cmd.exe");
            cmds.add("/C");
@@ -43,6 +102,7 @@ class TryProcessBuilder  {
 					}
       }
       public void doit(ArrayList<String> doWhat) {
+    	  out("now in 'doit' with an array-list argument passed in");
           List<String> cmds = new ArrayList<String>();
           cmds.add("cmd.exe");
           cmds.add("/C");
@@ -86,5 +146,11 @@ class TryProcessBuilder  {
         TryProcessBuilder tp = new TryProcessBuilder();
         tp.doit();         
       }
+	public boolean getIsWindows() {
+		return isWindows;
+	}
+	public void setIsWindows(boolean isWindows) {
+		this.isWindows = isWindows;
+	}
       
 }

@@ -26,10 +26,31 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 	    public int setMoveDirIdx = 0;
 	    public int setCopyDirIdx = 0;
 	    
+	    public String lastGoodFilePath = null;
+	    public String delumFilePath    = null;
+	    public String moveString       = null;
+	    
+	    public boolean isW = false;
+	    
 	    		
 		
 		public MakeFileYorNPanel(MainFlub b) {
-			fm = b;
+			 fm = b;
+			 setIsW( fm.isWindows());
+			 String path = null;
+			 if (getIsW()) {
+			           setLastGoodFilePath( new String("\\temp\\lastGoodFile.txt"));
+			           setDelumFilePath(    new String("\\temp\\delum.bat"));
+			           setMoveString      ( new String("move "));
+			 } else {
+				       setLastGoodFilePath( new String("/tmp/lastGoodFile.txt"));
+				       setDelumFilePath(    new String("/tmp/delum.bat"));
+				       setMoveString(       new String("mv "));
+			 }
+			
+			
+			
+			
 			out("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
 			out("Constructing make file yorn panel");
 			out("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
@@ -160,7 +181,7 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 	           //out("--------command: del "+fm.getIma().getTheFile());
 	           out("--------command: del "+fy.getPath());
 	           String fyString = fy.getPath();
-	           int lastSlash = fyString.lastIndexOf('\\');
+	           int lastSlash = fyString.lastIndexOf(File.separator);
 	           
                long bCount = fm.getIma().getTheFile().length();
                out("...adding file to delete list with byte length "+bCount);
@@ -298,6 +319,7 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 				TitledBorder tb = (TitledBorder ) p.getBorder();
 				JFrame f = fm.getYornFrame();
 				tb.setTitle(bTitle);
+				tb.setTitleFont(tb.getTitleFont().deriveFont(Font.PLAIN));
 				String fTitle = new String( "Keep, Discard or Move File Controls from " + fm.getDir().getPath());
 				f.setTitle(fTitle);
 				out("..........calling f.repaint()..............");
@@ -369,6 +391,12 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 		 //------------------MAKE BORDER TITLE---------------------------------------
 		 private String makeBorderTitle(LoadImageApp lia) {
 			 String digestedSize = digestSize(lia.getOriginalSize());
+			 int totalFiles = 
+						+ lia.getFilesSaved() 
+						+ lia.getFilesDeleted()
+						+ lia.getFilesMoved()
+						+ lia.getFilesCopyed();			 
+					 
 			 String bTitle = new String(
 					    //borderTitle + "  " +
 					    fm.getIma().getTheFile().getName()
@@ -386,6 +414,8 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 						+ lia.getFilesMoved()
 						+")   ( copied: "
 						+ lia.getFilesCopyed()
+						+")   (total: "
+						+ totalFiles
 						+")   ( bytes deleted: "
 						+ this.digestSize(lia.getBytesDeleted())
 						
@@ -396,9 +426,10 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 		 //----------------------------SaveLastDirectory----------------------------------------------
 		 public void saveLastKeptFile(File f) {
 			 uncout("Save last OK file " + f.getPath());
-			 String path = new String("\\temp\\lastGoodFile.txt");
-			 boolean append= false;
-			 Writer w = getWriter();
+			 
+			 String path     = getLastGoodFilePath();
+			 boolean append  = false;
+			 Writer w        = getWriter();
 			 boolean okwrite = w.tryWrite(path, "q:", "c:", f.getPath(), append);
 		     if (!okwrite) {
 				System.err.println("Uh Oh, failed to write to "+path);	
@@ -415,7 +446,7 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 				 return;
 			 }
 			 out("Move last OK file");
-			 String apath = new String("\\temp\\lastGoodFile.txt");
+			 String apath = getLastGoodFilePath();
 			 boolean append= false;
 			 Writer w = getWriter();
 			 boolean okwrite = w.tryWrite(apath, "q:", "c:", f.getPath(), append);
@@ -428,12 +459,23 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 		 }
 		//----------------------------SaveLastDirectory----------------------------------------------
 		 public void saveLastKeptFileAndDir(String wrteFilePath, String dir1, String dir2, String pathOfLastFile, boolean append ) {
+			 
 			 uncout("Save last OK file with path info");
-			 StringBuffer path = new StringBuffer("\\temp\\");//lastGoodFile.txt");
+			 StringBuffer path = null;
+			 String tEmp = null;
+			 if ( getIsW() ) {
+				 tEmp = "\\temp\\";
+			 } else {
+			 	 tEmp = "/tmp";
+			 }
+			 path = new StringBuffer(tEmp);
+			 path.append(File.separator);
+			 path.append("lastGoodFile.txt");
+			 
 			 StringBuffer add2path = new StringBuffer(pathOfLastFile);
-			 int rindex = add2path.lastIndexOf("\\");
+			 int rindex = add2path.lastIndexOf(File.separator);
 			 out("saveLastkeptFileAndDir: add2path is "+add2path.toString());
-			 out("saveLastkeptFileAndDir: rindex of last backslash is "+rindex);
+			 out("saveLastkeptFileAndDir: rindex of last separator is "+rindex);
 			 add2path.delete(rindex, add2path.length());
 			 out("saveLastkeptFileAndDir: after truncation: "+add2path.toString());
 			 int lindex = add2path.indexOf(":");
@@ -444,8 +486,8 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 			 boolean done = false;
 			 int stopper = 0;
 			 while(!done) {
-				 lindex = add2path.indexOf("\\");
-				 out("found backslash at "+lindex);
+				 lindex = add2path.indexOf(File.separator);
+				 out("found separator at "+lindex);
 				 if (lindex < 0) {
 					 done = true;
 				 } else {
@@ -456,15 +498,19 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 					 done = true;
 				 }
 			 }
-			 out("saveLastkeptFileAndDir: replaced backslashes "+add2path);
+			 out("saveLastkeptFileAndDir: replaced separators "+add2path);
 			 add2path.delete(0,1);
 			 add2path.append("-lastGoodFile.txt");
-			 add2path.insert(0,"\\temp\\");
-			 out("saveLastkeptFileAndDir: replaced backslashes "+add2path);
+			 add2path.insert(0,tEmp);
+			 out("saveLastkeptFileAndDir: replaced separators "+add2path);
 			 			 
 			 Writer w = getWriter();
 			 boolean okwrite = true;
+			 if ( getIsW() ) {
 			 okwrite = w.tryWrite(add2path.toString(), "q:", "c:", pathOfLastFile, append);
+			 } else {
+				 okwrite = w.tryWrite(add2path.toString(), "/", "/", pathOfLastFile, append);
+			 }
 		     if (!okwrite) {
 				System.err.println("Uh Oh, failed to write to "+path);	
 			 }
@@ -475,9 +521,13 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 
 			public void saveFileLine(File f) {
 				out("SAVE item  TO BAT FILE");
-				//new String("\\temp\\delum.bat");
+				
 				String cmdFilePath = fm.getCmdFilePath();
-				String cmd  = new String ("del \""+f.getPath()+"\"\n");
+				String delCmd = "del \"";
+				if (!fm.isWindows()) {
+					delCmd = "rm -f \"";						
+				}
+				String cmd  = new String (delCmd+f.getPath()+"\"\n");
 				int num     = fm.getIma().getFilesDeleted();
 				fm.getIma().setFilesDeleted(num+1);
 				boolean append = true;
@@ -511,8 +561,8 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 					JOptionPane.showMessageDialog(fm.getFrayme(), "no 'move to' directory set. cannot move file.");
 					return;
 				}
-				String path = new String("\\temp\\delum.bat");
-				String cmd = new String ("move \"" + f.getPath() + "\" \"" + fm.getMoveToPath() + "\"\n");
+				String path = getDelumFilePath();
+				String cmd = new String (getMoveString() +" \"" + f.getPath() + "\" \"" + fm.getMoveToPath() + "\"\n");
 				int num = fm.getIma().getFilesMoved();
 				fm.getIma().setFilesMoved(num+1);
 				boolean append = true;
@@ -530,8 +580,8 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 					JOptionPane.showMessageDialog(fm.getFrayme(), "no 'move to' directory set from list. cannot move file.");
 					return;
 				}
-				String path = new String("\\temp\\delum.bat");
-				String cmd = new String ("move \"" + f.getPath() + "\" \"" + mdir + "\"\n");
+				String path = getDelumFilePath();
+				String cmd = new String (getMoveString() + " \"" + f.getPath() + "\" \"" + mdir + "\"\n");
 				int num = fm.getIma().getFilesMoved();
 				fm.getIma().setFilesMoved(num+1);
 				boolean append = true;
@@ -553,8 +603,12 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 					return;
 				}
 				
-				String path = new String("\\temp\\delum.bat");
-				String cmd = new String ("Copy \"" + f.getPath() + "\" \"" + cpath + "\"\n");
+				String path = getDelumFilePath();
+				String copyString = new String("copy ");
+				if (! getIsW()) {
+					copyString = new String("cp ");
+				}
+				String cmd = new String (copyString + " \"" + f.getPath() + "\" \"" + cpath + "\"\n");
 				int num = fm.getIma().getFilesCopyed();
 				fm.getIma().setFilesCopyed(num+1);
 				boolean append = true;
@@ -572,8 +626,12 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 					JOptionPane.showMessageDialog(fm.getFrayme(), "no 'copy to' directory set from list. cannot move file.");
 					return;
 				}
-				String path = new String("\\temp\\delum.bat");
-				String cmd = new String ("copy \"" + f.getPath() + "\" \"" + cpdir + "\"\n");
+				String path = getDelumFilePath();
+				String copyString = new String("copy ");
+				if (! getIsW()) {
+					copyString = new String("cp ");
+				}
+				String cmd = new String (copyString + " \"" + f.getPath() + "\" \"" + cpdir + "\"\n");
 				int num = fm.getIma().getFilesCopyed();
 				fm.getIma().setFilesCopyed(num+1);
 				boolean append = true;
@@ -602,6 +660,33 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 				}
 				//String dir = fm.getMoveToPath();
 				gmctCopy.setDir(mpath);
+			}
+			public String getLastGoodFilePath() {
+				return lastGoodFilePath;
+			}
+			public void setLastGoodFilePath(String lastGoodFilePath) {
+				this.lastGoodFilePath = lastGoodFilePath;
+			}
+			public String getDelumFilePath() {
+				return delumFilePath;
+			}
+			public void setDelumFilePath(String delumFilePath) {
+				this.delumFilePath = delumFilePath;
+			}
+			public String getMoveString() {
+				return moveString;
+			}
+			public void setMoveString(String moveString) {
+				this.moveString = moveString;
+			}
+			public boolean isW() {
+				return isW;
+			}
+			public void setIsW(boolean isW) {
+				this.isW = isW;
+			}
+			public boolean getIsW() {
+				return this.isW;
 			}
 
 	}

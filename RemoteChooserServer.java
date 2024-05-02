@@ -54,7 +54,7 @@ private String getThePath() {
 	File parn = new File(lyne);
 	out("parent of old path read in from file is "+parn.getParent());
 	File parnparn = new File(parn.getParent());
-	out("RemoteChooserServer: parent of parent is "+parnparn.getParent());
+	out("parent of parent is "+parnparn.getParent());
 	File targetDir = new File(parnparn.getParent());
 	 
 	 //fc = new JFileChooser(parn);
@@ -104,19 +104,24 @@ public String getNextFilePath( String fn) throws java.rmi.RemoteException {
 			  // protected void getProps(String ps){
 			System.out.println("USE:   java -classpath imageflubber.RemoteChooserServer.jar -p <propsfile> ");
 			System.out.println("Server starting.............................");
-			String ps = new String(args[1]);
-			System.out.println("props file name from args is "+ps);
-			Properties p = new Properties();
-			try {
-				p.load(new FileInputStream(ps));     
-			} catch (IOException e) {	    	 
-				System.err.println("Failed to read properties file " + ps + ", must quit!");
-			    System.exit(1);
-			}
-			
-			 System.out.println("RemoteChooserServer: Putting all props to system props");
-			 Properties sysProps = System.getProperties();
-			 sysProps.putAll(p);
+			if (args.length > 0) {		
+				String ps = new String(args[1]);
+				System.out.println("props file name from args is "+ps);
+				Properties p = new Properties();
+				try {
+					p.load(new FileInputStream(ps));     
+				} catch (IOException e) {	    	 
+					System.err.println("Failed to read properties file " + ps + ", must quit!");
+					System.exit(1);
+				}
+				
+				System.out.println("RemoteChooserServer: Putting all props to system props");
+				Properties sysProps = System.getProperties();
+				sysProps.putAll(p);
+				} else {
+					System.out.println("no props file submitted to remoteChooserServer");
+			    } // end of "any props file on the command line?
+		
 			 System.out.println("RemoteChooserServer: hostname is " + System.getProperty("java.rmi.server.hostname"));
 		    //String props = System.getProperties().getProperty("props");
 			try {

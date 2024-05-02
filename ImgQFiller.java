@@ -45,9 +45,9 @@ public class ImgQFiller extends Thread {
     			 listIdx = 0;
     			 int listRemaining = listSize-1;
     			 while (listIdx < listSize) {
-    				 out("TOPTOP of while loop, list IDX is "+listIdx+", of list size "+listSize);
+    				 //out("TOPTOP of while loop, list IDX is "+listIdx+", of list size "+listSize);
     				
-    				 out("Loading img for image "+listIdx+" which is "+bigList.get(listIdx).getPath()+", myLbq.size() is "+myLbq.size());
+    				 //out("Loading img for image "+listIdx+" which is "+bigList.get(listIdx).getPath()+", myLbq.size() is "+myLbq.size());
     				 int sz = myLbq.size();
     				 boolean goodimage = false;
     				 LoadImageApp lia = null;
@@ -70,13 +70,13 @@ public class ImgQFiller extends Thread {
     				 }
     				 
     				 if ( goodimage) {
-    					 out(".....putting image, before queue size is "+sz);
+    					 //out(".....putting image, before queue size is "+sz);
     					 myLbq.put(lia);
     					 sz = myLbq.size();
-    					 out(".....put image, list idx is " + 
-    							 listIdx + ", biglist length " + 
-    							 bigList.size() + ", after  queue size is "+
-    							 sz + ", remaining in list: "+listRemaining);
+    					 //out(".....put image, list idx is " + 
+    					//		 listIdx + ", biglist length " + 
+    					//		 bigList.size() + ", after  queue size is "+
+    					//		 sz + ", remaining in list: "+listRemaining);
     				 }else{
     					 out("Uh Oh, load image failed");
     				 }
