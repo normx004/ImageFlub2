@@ -44,8 +44,8 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 			           setMoveString      ( new String("move "));
 			 } else {
 				       setLastGoodFilePath( new String("/tmp/lastGoodFile.txt"));
-				       setDelumFilePath(    new String("/tmp/delum.bat"));
-				       setMoveString(       new String("mv "));
+				       setDelumFilePath(    new String("/tmp/delum.bash"));
+				       setMoveString(       new String("mv -v "));
 			 }
 			
 			
@@ -66,7 +66,24 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 			if (fm.getMoveList() != null) {
 				int kx = k+1;
 				out("adding altMove button at "+kx);
-				buttLabels.add( new String(MainFlub.AltMove));
+				
+				StringBuffer mvLabel=new StringBuffer("<html>div style='text-align:center'>"
+						+MainFlub.AltMove+
+						"<br><font-size='3'>");
+				String mvPath =  fm.getAltMoveToPath();
+				if (mvPath != null) {
+					String use4label = new File(mvPath).getName();
+					mvLabel.append(use4label);
+				} else {
+					mvLabel.append("no target");
+				}
+				out ("MovelableM is "+mvLabel.toString());
+				mvLabel.append("</font></div></html>");
+				if (mvPath == null) {	
+				    buttLabels.add( new String(MainFlub.AltMove));
+				} else {
+					buttLabels.add(mvLabel.toString());
+				}
 				k += 1;
 				moveListIdx = k;
 			}
@@ -525,7 +542,7 @@ public class MakeFileYorNPanel  extends MakeArbitraryPanel {
 				String cmdFilePath = fm.getCmdFilePath();
 				String delCmd = "del \"";
 				if (!fm.isWindows()) {
-					delCmd = "rm -f \"";						
+					delCmd = "rm -v \"";						
 				}
 				String cmd  = new String (delCmd+f.getPath()+"\"\n");
 				int num     = fm.getIma().getFilesDeleted();

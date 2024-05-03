@@ -442,8 +442,8 @@ same env as SERVER but
             	
             	TryProcessBuilder tp = new TryProcessBuilder();
             	tp.doit(cmdList);
-        }
-        else {
+        }  else {
+        	  //setCmdString3("/tmp/delum.bash"); // cmdString3 not used except in block just above here
         	  JOptionPane.showMessageDialog(null, "NO undoit in Linux (yet...)", "TRIED UNDOIT",JOptionPane.PLAIN_MESSAGE );            
         }   	
         
@@ -455,6 +455,11 @@ same env as SERVER but
 		String aarg = arg0;
 		if (aarg == null) {
 			aarg = new String("nullllll");
+		}
+		boolean isW = isWindows();
+		if (! isW ) {
+			setCmdFilePath("/tmp/delum.bash");
+			//setCmdString3("/tmp/delum.bash"); cmdString3 not used anywhere where it conflicts...
 		}
 		out("getting directory "+aarg);
 		File fyle = null;
@@ -509,7 +514,7 @@ same env as SERVER but
 		 
 		 boolean isWin = this.isWindows();
 		 if (! isWin ) {
-		     setCmdFilePath("/tmp/delum.bat");
+		     setCmdFilePath("/tmp/delum.bash");
 		 }
 		 
 		 
@@ -619,6 +624,9 @@ same env as SERVER but
 		  fm.setup(arg);
 		  fm.doit();
 	  }
+	public void setWindows(boolean isWindows) {
+		this.isWindows = isWindows;
+	}
 	
 	
 	
